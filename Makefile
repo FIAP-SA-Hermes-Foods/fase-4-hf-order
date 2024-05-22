@@ -10,3 +10,9 @@ run-terraform:
 	terraform -chdir=infrastructure/terraform init;
 	terraform -chdir=infrastructure/terraform plan;
 	terraform -chdir=infrastructure/terraform apply;
+
+run-bdd:
+	docker build -f ./infrastructure/docker/Dockerfile.go_app_bdd -t hf-order-bdd:latest .;
+	docker run --rm --name hf-order-bdd hf-order-bdd:latest
+	@docker rmi -f hf-order-bdd >/dev/null 2>&1
+	@docker rm $$(docker ps -a -f status=exited -q) -f >/dev/null 2>&1

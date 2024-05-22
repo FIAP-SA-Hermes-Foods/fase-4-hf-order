@@ -13,7 +13,7 @@ import (
 var (
 	queryGetOrderItemByOrderID = `SELECT * from orders_items where orders_id = $1`
 	queryGetOrderItems         = `SELECT * from orders_items`
-	querySaveOrderItems        = `INSERT INTO orders_items (id, orders_id, product_uuid, quantity, total_price, discount, created_at) VALUES (DEFAULT, $1, $2, $3, $4, $5, now()) RETURNING id, created_at`
+	querySaveOrderItems        = `INSERT INTO orders_items (id, orders_id, product_uuid, quantity, total_price, discount, created_at) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6) RETURNING id, created_at`
 )
 
 var _ repository.OrderItemRepository = (*orderItemDB)(nil)
@@ -148,14 +148,15 @@ func (o *orderItemDB) SaveOrderItem(order dto.OrderItemDB) (*dto.OrderItemDB, er
 	defer o.Database.CloseStmt()
 
 	var outOrder = &dto.OrderItemDB{
-		Quantity:    order.ID,
+		Quantity:    order.Quantity,
 		TotalPrice:  order.TotalPrice,
 		Discount:    order.Discount,
 		OrderID:     order.OrderID,
 		ProductUUID: order.ProductUUID,
+		CreatedAt:   order.CreatedAt,
 	}
 
-	o.Database.QueryRow(order.OrderID, order.ProductUUID, order.Quantity, order.TotalPrice, order.Discount)
+	o.Database.QueryRow(order.OrderID, order.ProductUUID, order.Quantity, order.TotalPrice, order.Discount, order.CreatedAt)
 
 	if err := o.Database.ScanStmt(&outOrder.ID, &outOrder.CreatedAt); err != nil {
 		l.Errorf("SaveOrderItem error to scan statement: ", " | ", err)

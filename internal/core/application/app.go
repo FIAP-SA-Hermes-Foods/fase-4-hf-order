@@ -9,7 +9,9 @@ import (
 	vo "fase-4-hf-order/internal/core/domain/entity/valueObject"
 	"fase-4-hf-order/internal/core/domain/repository"
 	"fase-4-hf-order/internal/core/domain/useCase"
+	"fmt"
 	"strings"
+	"time"
 )
 
 type Application interface {
@@ -31,6 +33,56 @@ func NewApplication(orderRepo repository.OrderRepository, orderItemRepo reposito
 
 func (app application) UpdateOrderByID(id int64, reqOrder dto.RequestOrder) (*dto.OutputOrder, error) {
 	l.Infof("UpdateOrderByIDApp: ", " | ", id, " | ", ps.MarshalString(reqOrder))
+
+	foundOrder, err := app.GetOrderByID(id)
+
+	if err != nil {
+		l.Errorf("UpdateOrderByIDApp error: ", " | ", err)
+		return nil, err
+	}
+
+	if foundOrder == nil {
+		l.Errorf("UpdateOrderByIDApp error: ", " | ", fmt.Sprintf("order not found with ID: %v", id))
+		return nil, fmt.Errorf("order not found with ID: %v", id)
+	}
+
+	var (
+		clientUuid       = foundOrder.ClientUUID
+		voucherUuid      = foundOrder.VoucherUUID
+		status           = foundOrder.Status
+		verificationCode = foundOrder.VerificationCode
+		createdAt        = foundOrder.CreatedAt
+	)
+
+	if len(reqOrder.ClientUUID) > 0 {
+		clientUuid = reqOrder.ClientUUID
+	}
+
+	if len(reqOrder.VoucherUUID) > 0 {
+		voucherUuid = reqOrder.VoucherUUID
+	}
+
+	if len(reqOrder.Status) > 0 {
+		status = reqOrder.Status
+	}
+
+	if len(reqOrder.VerificationCode) > 0 {
+		clientUuid = reqOrder.VerificationCode
+	}
+
+	if len(reqOrder.CreatedAt) > 0 {
+		clientUuid = reqOrder.CreatedAt
+	}
+
+	reqOrder = dto.RequestOrder{
+		ID:               id,
+		ClientUUID:       clientUuid,
+		VoucherUUID:      voucherUuid,
+		Status:           status,
+		VerificationCode: verificationCode,
+		CreatedAt:        createdAt,
+	}
+
 	if err := app.UpdateOrderByIDUseCase(id, reqOrder); err != nil {
 		l.Errorf("UpdateOrderByIDApp error: ", " | ", err)
 		return nil, err
@@ -38,11 +90,11 @@ func (app application) UpdateOrderByID(id int64, reqOrder dto.RequestOrder) (*dt
 
 	oDB := dto.OrderDB{
 		ID:               id,
-		ClientUUID:       reqOrder.ClientUUID,
-		VoucherUUID:      reqOrder.VoucherUUID,
-		Status:           reqOrder.Status,
-		VerificationCode: reqOrder.VerificationCode,
-		CreatedAt:        reqOrder.CreatedAt,
+		ClientUUID:       clientUuid,
+		VoucherUUID:      voucherUuid,
+		Status:           status,
+		VerificationCode: verificationCode,
+		CreatedAt:        createdAt,
 	}
 
 	order, err := app.UpdateOrderByIDRepository(id, oDB)
@@ -175,14 +227,33 @@ func (app application) SaveOrder(order dto.RequestOrder) (*dto.OutputOrder, erro
 		return nil, err
 	}
 
-	for _, orderItems := range order.Items {
+	nowFmt := time.Now().Format("02-01-2006 15:04:05")
 
+	oDb := dto.OrderDB{
+		ClientUUID:       order.ClientUUID,
+		VoucherUUID:      order.VoucherUUID,
+		Items:            order.Items,
+		Status:           order.Status,
+		VerificationCode: order.VerificationCode,
+		CreatedAt:        nowFmt,
+	}
+
+	o, err := app.SaveOrderRepository(oDb)
+
+	if err != nil {
+		l.Errorf("SaveOrderApp error: ", " | ", err)
+		return nil, err
+
+	}
+
+	for _, orderItems := range order.Items {
 		opIn := dto.OrderItemDB{
-			OrderID:     order.ID,
+			OrderID:     o.ID,
 			ProductUUID: orderItems.ProductUUID,
 			Quantity:    orderItems.Quantity,
 			TotalPrice:  orderItems.TotalPrice,
 			Discount:    orderItems.Discount,
+			CreatedAt:   nowFmt,
 		}
 
 		opService, err := app.SaveOrderItemRepository(opIn)
@@ -197,22 +268,6 @@ func (app application) SaveOrder(order dto.RequestOrder) (*dto.OutputOrder, erro
 			l.Infof("SaveOrderApp output: ", " | ", orderProductNullErr)
 			return nil, orderProductNullErr
 		}
-	}
-
-	oDb := dto.OrderDB{
-		ClientUUID:       order.ClientUUID,
-		VoucherUUID:      order.VoucherUUID,
-		Items:            order.Items,
-		Status:           order.Status,
-		VerificationCode: order.VerificationCode,
-	}
-
-	o, err := app.SaveOrderRepository(oDb)
-
-	if err != nil {
-		l.Errorf("SaveOrderApp error: ", " | ", err)
-		return nil, err
-
 	}
 
 	outOrder := &dto.OutputOrder{

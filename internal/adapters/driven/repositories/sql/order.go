@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	queryGetOrders    = `SELECT * FROM orders ORDER BY created_at ASC`
-	queryGetOrderByID = `SELECT * FROM orders WHERE id = $1`
+	queryGetOrders    = `SELECT o.id, o.status, o.verification_code, o.created_at, o.client_uuid, o.voucher_uuid FROM orders o ORDER BY created_at ASC`
+	queryGetOrderByID = `SELECT o.id, o.status, o.verification_code, o.created_at, o.client_uuid, o.voucher_uuid FROM orders o WHERE id = $1`
 	querySaveOrder    = `INSERT INTO orders (id, status, verification_code, created_at, client_uuid, voucher_uuid) VALUES (DEFAULT, $1, $2, now(), $3, $4) RETURNING id, created_at`
 	queryUpdateOrder  = `UPDATE orders SET status = $1, client_uuid = $2, voucher_uuid = $3 WHERE id = $4 RETURNING id, created_at`
 )
@@ -85,7 +85,6 @@ func (o orderDB) UpdateOrderByID(id int64, order dto.OrderDB) (*dto.OrderDB, err
 		Status:           order.Status,
 		VerificationCode: order.VerificationCode,
 	}
-
 	o.Database.QueryRow(order.Status, order.ClientUUID, order.VoucherUUID, id)
 
 	if err := o.Database.ScanStmt(&outOrder.ID, &outOrder.CreatedAt); err != nil {
