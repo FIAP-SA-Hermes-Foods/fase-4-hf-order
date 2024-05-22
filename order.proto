@@ -6,13 +6,13 @@ message Item {
   int64 quantity = 2;
 }
 
-message CreateRequest {
+message CreateOrderRequest {
   string clientUuid = 1;
   string voucherUuid = 2;
   repeated Item items = 3;
 }
 
-message CreateResponse {
+message CreateOrderResponse {
   int64 id = 1;
   string clientUuid = 2;
   string voucherUuid = 3;
@@ -22,9 +22,9 @@ message CreateResponse {
   string createdAt = 7;
 }
 
-message GetByIDRequest { int64 id = 1; }
+message GetOrderByIDRequest { int64 id = 1; }
 
-message GetByIDResponse {
+message GetOrderByIDResponse {
   int64 id = 1;
   string clientUuid = 2;
   string voucherUuid = 3;
@@ -34,7 +34,7 @@ message GetByIDResponse {
   string createdAt = 7;
 }
 
-message UpdateRequest {
+message UpdateOrderRequest {
   int64 id = 1;
   string clientUuid = 2;
   string voucherUuid = 3;
@@ -44,7 +44,7 @@ message UpdateRequest {
   string createdAt = 7;
 }
 
-message UpdateResponse {
+message UpdateOrderResponse {
   int64 id = 1;
   string clientUuid = 2;
   string voucherUuid = 3;
@@ -64,13 +64,13 @@ message OrderItem {
   string createdAt = 7;
 }
 
-message GetRequest {}
+message GetOrderRequest {}
 
-message GetResponse { repeated OrderItem orders = 1; }
+message GetOrderResponse { repeated OrderItem orders = 1; }
 
 service Order {
-  rpc Create(CreateRequest) returns (CreateResponse);
-  rpc GetByID(GetByIDRequest) returns (GetByIDResponse);
-  rpc Update(UpdateRequest) returns (UpdateResponse);
-  rpc Get(GetRequest) returns (GetResponse);
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrderByID(GetOrderByIDRequest) returns (GetOrderByIDResponse);
+  rpc UpdateOrder(UpdateOrderRequest) returns (UpdateOrderResponse);
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
 }

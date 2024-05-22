@@ -1,4 +1,5 @@
 build-proto:
+	rm -f order_proto/*;
 	protoc \
 	--go_out=order_proto \
 	--go_opt=paths=source_relative \

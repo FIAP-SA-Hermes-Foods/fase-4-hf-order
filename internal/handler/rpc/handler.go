@@ -25,7 +25,7 @@ func (h *handlerGRPC) Handler() *handlerGRPC {
 	return h
 }
 
-func (h *handlerGRPC) Create(ctx context.Context, cr *cp.CreateRequest) (*cp.CreateResponse, error) {
+func (h *handlerGRPC) CreateOrder(ctx context.Context, cr *cp.CreateOrderRequest) (*cp.CreateOrderResponse, error) {
 	items := make([]entity.OrderItems, 0)
 
 	for i := range cr.Items {
@@ -62,7 +62,7 @@ func (h *handlerGRPC) Create(ctx context.Context, cr *cp.CreateRequest) (*cp.Cre
 		outItems = append(outItems, &item)
 	}
 
-	out := &cp.CreateResponse{
+	out := &cp.CreateOrderResponse{
 		Id:               o.ID,
 		ClientUuid:       o.ClientUUID,
 		VoucherUuid:      o.VoucherUUID,
@@ -75,7 +75,7 @@ func (h *handlerGRPC) Create(ctx context.Context, cr *cp.CreateRequest) (*cp.Cre
 	return out, nil
 }
 
-func (h *handlerGRPC) GetByID(ctx context.Context, gr *cp.GetByIDRequest) (*cp.GetByIDResponse, error) {
+func (h *handlerGRPC) GetOrderByID(ctx context.Context, gr *cp.GetOrderByIDRequest) (*cp.GetOrderByIDResponse, error) {
 	o, err := h.app.GetOrderByID(gr.Id)
 
 	if err != nil {
@@ -96,7 +96,7 @@ func (h *handlerGRPC) GetByID(ctx context.Context, gr *cp.GetByIDRequest) (*cp.G
 		outItems = append(outItems, &item)
 	}
 
-	out := &cp.GetByIDResponse{
+	out := &cp.GetOrderByIDResponse{
 		Id:               o.ID,
 		ClientUuid:       o.ClientUUID,
 		VoucherUuid:      o.VoucherUUID,
@@ -109,7 +109,7 @@ func (h *handlerGRPC) GetByID(ctx context.Context, gr *cp.GetByIDRequest) (*cp.G
 	return out, nil
 }
 
-func (h *handlerGRPC) Update(ctx context.Context, ur *cp.UpdateRequest) (*cp.UpdateResponse, error) {
+func (h *handlerGRPC) UpdateOrder(ctx context.Context, ur *cp.UpdateOrderRequest) (*cp.UpdateOrderResponse, error) {
 	items := make([]entity.OrderItems, 0)
 
 	for i := range ur.Items {
@@ -146,7 +146,7 @@ func (h *handlerGRPC) Update(ctx context.Context, ur *cp.UpdateRequest) (*cp.Upd
 		outItems = append(outItems, &item)
 	}
 
-	out := &cp.UpdateResponse{
+	out := &cp.UpdateOrderResponse{
 		Id:               o.ID,
 		ClientUuid:       o.ClientUUID,
 		VoucherUuid:      o.VoucherUUID,
@@ -159,7 +159,7 @@ func (h *handlerGRPC) Update(ctx context.Context, ur *cp.UpdateRequest) (*cp.Upd
 	return out, nil
 }
 
-func (h *handlerGRPC) Get(context.Context, *cp.GetRequest) (*cp.GetResponse, error) {
+func (h *handlerGRPC) GetOrder(context.Context, *cp.GetOrderRequest) (*cp.GetOrderResponse, error) {
 
 	o, err := h.app.GetOrders()
 
@@ -198,7 +198,7 @@ func (h *handlerGRPC) Get(context.Context, *cp.GetRequest) (*cp.GetResponse, err
 
 	}
 
-	out := &cp.GetResponse{
+	out := &cp.GetOrderResponse{
 		Orders: outOrders,
 	}
 
