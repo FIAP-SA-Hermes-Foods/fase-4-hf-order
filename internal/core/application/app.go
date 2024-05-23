@@ -4,7 +4,6 @@ import (
 	"errors"
 	l "fase-4-hf-order/external/logger"
 	ps "fase-4-hf-order/external/strings"
-	"fase-4-hf-order/internal/core/domain/entity"
 	"fase-4-hf-order/internal/core/domain/entity/dto"
 	vo "fase-4-hf-order/internal/core/domain/entity/valueObject"
 	"fase-4-hf-order/internal/core/domain/repository"
@@ -148,9 +147,11 @@ func (app application) GetOrders() ([]dto.OutputOrder, error) {
 			return nil, err
 		}
 
-		itemOutList := make([]entity.OrderItems, 0)
+		itemOutList := make([]dto.OutputOrderItem, 0)
 		for _, op := range orderItemList {
-			itemOutList = append(itemOutList, entity.OrderItems{
+			itemOutList = append(itemOutList, dto.OutputOrderItem{
+				ID:          op.ID,
+				OrderID:     op.OrderID,
 				ProductUUID: op.ProductUUID,
 				Quantity:    op.Quantity,
 			})
@@ -197,9 +198,11 @@ func (app application) GetOrderByID(id int64) (*dto.OutputOrder, error) {
 		return nil, err
 	}
 
-	itemOutList := make([]entity.OrderItems, 0)
+	itemOutList := make([]dto.OutputOrderItem, 0)
 	for _, op := range orderItemList {
-		itemOutList = append(itemOutList, entity.OrderItems{
+		itemOutList = append(itemOutList, dto.OutputOrderItem{
+			ID:          op.ID,
+			OrderID:     op.OrderID,
 			ProductUUID: op.ProductUUID,
 			Quantity:    op.Quantity,
 		})

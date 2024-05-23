@@ -3,7 +3,8 @@ option go_package = "fase-4-hf-order/order-proto";
 
 message Item {
   string productUuid = 1;
-  int64 quantity = 2;
+  int64 orderId = 2;
+  int64 quantity = 3;
 }
 
 message CreateOrderRequest {
