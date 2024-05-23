@@ -3,7 +3,6 @@ package rpc
 import (
 	"context"
 	"fase-4-hf-order/internal/core/application"
-	"fase-4-hf-order/internal/core/domain/entity"
 	"fase-4-hf-order/internal/core/domain/entity/dto"
 	cp "fase-4-hf-order/order_proto"
 )
@@ -26,11 +25,11 @@ func (h *handlerGRPC) Handler() *handlerGRPC {
 }
 
 func (h *handlerGRPC) CreateOrder(ctx context.Context, cr *cp.CreateOrderRequest) (*cp.CreateOrderResponse, error) {
-	items := make([]entity.OrderItems, 0)
+	items := make([]dto.OutputOrderItem, 0)
 
 	for i := range cr.Items {
-
-		items = append(items, entity.OrderItems{
+		items = append(items, dto.OutputOrderItem{
+			OrderID:     cr.Items[i].OrderId,
 			ProductUUID: cr.Items[i].ProductUuid,
 			Quantity:    cr.Items[i].Quantity,
 		})
@@ -110,11 +109,11 @@ func (h *handlerGRPC) GetOrderByID(ctx context.Context, gr *cp.GetOrderByIDReque
 }
 
 func (h *handlerGRPC) UpdateOrder(ctx context.Context, ur *cp.UpdateOrderRequest) (*cp.UpdateOrderResponse, error) {
-	items := make([]entity.OrderItems, 0)
+	items := make([]dto.OutputOrderItem, 0)
 
 	for i := range ur.Items {
-
-		items = append(items, entity.OrderItems{
+		items = append(items, dto.OutputOrderItem{
+			OrderID:     ur.Items[i].OrderId,
 			ProductUUID: ur.Items[i].ProductUuid,
 			Quantity:    ur.Items[i].Quantity,
 		})
