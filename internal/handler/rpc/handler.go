@@ -38,6 +38,7 @@ func (h *handlerGRPC) CreateOrder(ctx context.Context, cr *cp.CreateOrderRequest
 	input := dto.RequestOrder{
 		ClientUUID:  cr.ClientUuid,
 		VoucherUUID: cr.ClientUuid,
+		Status:      cr.Status,
 		Items:       items,
 	}
 
@@ -91,6 +92,7 @@ func (h *handlerGRPC) GetOrderByID(ctx context.Context, gr *cp.GetOrderByIDReque
 		item := cp.Item{
 			ProductUuid: o.Items[i].ProductUUID,
 			Quantity:    o.Items[i].Quantity,
+			OrderId:     o.Items[i].OrderID,
 		}
 		outItems = append(outItems, &item)
 	}
@@ -141,6 +143,7 @@ func (h *handlerGRPC) UpdateOrder(ctx context.Context, ur *cp.UpdateOrderRequest
 		item := cp.Item{
 			ProductUuid: o.Items[i].ProductUUID,
 			Quantity:    o.Items[i].Quantity,
+			OrderId:     o.Items[i].OrderID,
 		}
 		outItems = append(outItems, &item)
 	}
@@ -179,6 +182,7 @@ func (h *handlerGRPC) GetOrder(context.Context, *cp.GetOrderRequest) (*cp.GetOrd
 			item := cp.Item{
 				ProductUuid: o[orderIdx].Items[i].ProductUUID,
 				Quantity:    o[orderIdx].Items[i].Quantity,
+				OrderId:     o[orderIdx].Items[i].OrderID,
 			}
 			outItems = append(outItems, &item)
 		}

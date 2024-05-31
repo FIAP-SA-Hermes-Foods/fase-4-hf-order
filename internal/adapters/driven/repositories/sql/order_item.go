@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	queryGetOrderItemByOrderID = `SELECT * from orders_items where orders_id = $1`
-	queryGetOrderItems         = `SELECT * from orders_items`
+	queryGetOrderItemByOrderID = `SELECT oi.id, oi.orders_id, oi.product_uuid, oi.quantity, oi.total_price, oi.discount, oi.created_at from orders_items oi where orders_id = $1`
+	queryGetOrderItems         = `SELECT oi.id, oi.orders_id, oi.product_uuid, oi.quantity, oi.total_price, oi.discount, oi.created_at from orders_items oi`
 	querySaveOrderItems        = `INSERT INTO orders_items (id, orders_id, product_uuid, quantity, total_price, discount, created_at) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6) RETURNING id, created_at`
 )
 
@@ -49,15 +49,7 @@ func (o *orderItemDB) GetAllOrderItem() ([]dto.OrderItemDB, error) {
 	for o.Database.GetNextRows() {
 		var orderItem dto.OrderItemDB
 
-		err := o.Database.Scan(
-			&order.ID,
-			&order.Quantity,
-			&order.TotalPrice,
-			&order.Discount,
-			&order.OrderID,
-			&order.ProductUUID,
-			&order.CreatedAt,
-		)
+		err := o.Database.Scan(&order.ID, &order.OrderID, &order.ProductUUID, &order.Quantity, &order.TotalPrice, &order.Discount, &order.CreatedAt)
 
 		if err != nil {
 			l.Errorf("GetAllOrderItem error to scan database: ", " | ", err)
@@ -101,15 +93,7 @@ func (o *orderItemDB) GetAllOrderItemByOrderID(id int64) ([]dto.OrderItemDB, err
 	for o.Database.GetNextRows() {
 		var orderItem dto.OrderItemDB
 
-		err := o.Database.Scan(
-			&order.ID,
-			&order.Quantity,
-			&order.TotalPrice,
-			&order.Discount,
-			&order.OrderID,
-			&order.ProductUUID,
-			&order.CreatedAt,
-		)
+		err := o.Database.Scan(&order.ID, &order.OrderID, &order.ProductUUID, &order.Quantity, &order.TotalPrice, &order.Discount, &order.CreatedAt)
 
 		if err != nil {
 			l.Errorf("GetAllOrderItemByOrderID error to scan database: ", " | ", err)
@@ -148,11 +132,11 @@ func (o *orderItemDB) SaveOrderItem(order dto.OrderItemDB) (*dto.OrderItemDB, er
 	defer o.Database.CloseStmt()
 
 	var outOrder = &dto.OrderItemDB{
+		OrderID:     order.OrderID,
+		ProductUUID: order.ProductUUID,
 		Quantity:    order.Quantity,
 		TotalPrice:  order.TotalPrice,
 		Discount:    order.Discount,
-		OrderID:     order.OrderID,
-		ProductUUID: order.ProductUUID,
 		CreatedAt:   order.CreatedAt,
 	}
 

@@ -10,7 +10,8 @@ message Item {
 message CreateOrderRequest {
   string clientUuid = 1;
   string voucherUuid = 2;
-  repeated Item items = 3;
+  string status = 3;
+  repeated Item items = 4;
 }
 
 message CreateOrderResponse {
